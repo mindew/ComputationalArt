@@ -1,6 +1,7 @@
-""" TODO: Put your header comment here """
+""" This code generates the computational arts """
 
 import random
+import math
 from PIL import Image
 
 
@@ -15,8 +16,14 @@ def build_random_function(min_depth, max_depth):
                  (see assignment writeup for details on the representation of
                  these functions)
     """
-    # TODO: implement this
-    pass
+    functions = ["prod", "avg", "cos_pi", "sin_pi", "cube", "square", "x", "y"]
+    depth = random.randint(min_depth, max_depth)
+    # randomly generates the depth value between min_depth and max_depth
+    if depth == 1:
+        return random.choice(functions[6:7])
+        # randomly select string between x or y
+    return[random.choice(functions[0:6]), build_random_function(depth-1, depth-1), build_random_function(depth-1, depth-1)]
+    # returns randomly generated function represented as a nested list
 
 
 def evaluate_random_function(f, x, y):
@@ -33,8 +40,27 @@ def evaluate_random_function(f, x, y):
         >>> evaluate_random_function(["y"],0.1,0.02)
         0.02
     """
-    # TODO: implement this
-    pass
+    for item in f:
+        if item == "x":
+            return x
+        elif item == "y":
+            return y
+        elif item == "prod":
+            return evaluate_random_function(f[1], x, y) * evaluate_random_function(f[2], x, y)
+            # multiply x and y
+        elif item == "avg":
+            return 0.5 * ((evaluate_random_function(f[1], x, y) + evaluate_random_function(f[2], x, y)))
+        elif item == "cos_pi":
+            return math.cos(math.pi*(evaluate_random_function(f[1], x, y)))
+        elif item == "sin_pi":
+            return math.sin(math.pi*(evaluate_random_function(f[1], x, y)))
+        elif item == "cube":
+            return (evaluate_random_function(f[1], x, y))**3
+        elif item == "square":
+            return (evaluate_random_function(f[1], x, y))**2
+        else:
+            return -1
+    return -1
 
 
 def remap_interval(val,
@@ -64,8 +90,11 @@ def remap_interval(val,
         >>> remap_interval(5, 4, 6, 1, 2)
         1.5
     """
-    # TODO: implement this
-    pass
+    dInput = input_interval_start - input_interval_end
+    dOutput = output_interval_start - output_interval_end
+    slope = dOutput/dInput
+    res = slope*(val-input_interval_start) + output_interval_start
+    return res
 
 
 def color_map(val):
@@ -116,35 +145,48 @@ def generate_art(filename, x_size=350, y_size=350):
         x_size, y_size: optional args to set image dimensions (default: 350)
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = ["x"]
-    green_function = ["y"]
-    blue_function = ["x"]
+
+    red_function = build_random_function(7, 9)
+    # red is the function of x
+    green_function = build_random_function(7, 9)
+
+    # green is the function of y
+    blue_function = build_random_function(7, 9)
+    # blue is the function of x
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
+    # "RGB" indicates that the image has three color channels
     pixels = im.load()
+    # im.load command returns a pixel access object
     for i in range(x_size):
         for j in range(y_size):
+            # nested for loops create each pixel value based on evaluationg
+            # the red, green and blue channel functions
             x = remap_interval(i, 0, x_size, -1, 1)
             y = remap_interval(j, 0, y_size, -1, 1)
+            # the functions we will be generating have inputs
+            # in the interval [-1,+1] and outputs in the interval[-1,+1]
+            # remap interval remaps [0.349]to the values between [-1,+1]
             pixels[i, j] = (
                     color_map(evaluate_random_function(red_function, x, y)),
                     color_map(evaluate_random_function(green_function, x, y)),
                     color_map(evaluate_random_function(blue_function, x, y))
                     )
-
+            # evaluates each the red, green,and blue channel functions
+            # to obtain the intensity for each color channel for the pixe(i,j)
     im.save(filename)
-
+    # saves the image to disk as specified filename("myart.png")
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(verbose=True)
 
     # Create some computational art!
     # TODO: Un-comment the generate_art function call after you
     #       implement remap_interval and evaluate_random_function
-    # generate_art("myart.png")
+    generate_art("example2.png")
 
     # Test that PIL is installed correctly
     # TODO: Comment or remove this function call after testing PIL install
-    test_image("noise.png")
+    # test_image("noise.png")
