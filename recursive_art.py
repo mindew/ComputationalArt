@@ -4,6 +4,9 @@ import random
 import math
 from PIL import Image
 
+x_size = 350
+y_size = 350
+
 
 def build_random_function(min_depth, max_depth):
     """ Builds a random function of depth at least min_depth and depth
@@ -138,23 +141,23 @@ def test_image(filename, x_size=350, y_size=350):
     im.save(filename)
 
 
-def generate_art(filename, x_size=350, y_size=350):
-    """ Generate computational art and save as an image file.
+def generate_movie(filename, x_size=350, y_size=350):
+    movielist = []
+    for j in range(0, 50):
+        movielist.append(random.randint(1, 200))
+    for i in range(0, 50):
+        img = movielist[i]
+        generate_art(filename, x_size, y_size, i, img)
 
-        filename: string filename for image (should be .png)
-        x_size, y_size: optional args to set image dimensions (default: 350)
-    """
+
+def generate_art(filename, x_size, y_size, i, img):
     # Functions for red, green, and blue channels - where the magic happens!
-
     red_function = build_random_function(7, 9)
     # red is the function of x
     green_function = build_random_function(7, 9)
-
     # green is the function of y
     blue_function = build_random_function(7, 9)
     # blue is the function of x
-
-    # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
     # "RGB" indicates that the image has three color channels
     pixels = im.load()
@@ -178,14 +181,15 @@ def generate_art(filename, x_size=350, y_size=350):
     im.save(filename)
     # saves the image to disk as specified filename("myart.png")
 
+
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod(verbose=True)
+    # import doctest
+    # doctest.testmod(verbose=True)
 
     # Create some computational art!
     # TODO: Un-comment the generate_art function call after you
     #       implement remap_interval and evaluate_random_function
-    generate_art("example2.png")
+    generate_movie("movie.png")
 
     # Test that PIL is installed correctly
     # TODO: Comment or remove this function call after testing PIL install
