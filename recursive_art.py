@@ -1,4 +1,6 @@
-""" This code generates the computational arts """
+""" This code generates the computational arts. Movie generator
+    renders images that are generated from generate_art as a video.
+    Created by Minju Kang"""
 
 import random
 import math
@@ -144,7 +146,7 @@ def test_image(filename, x_size=350, y_size=350):
 def generate_movie(filename, x_size=350, y_size=350):
     movielist = []
     for j in range(0, 50):
-        movielist.append(random.randint(1, 200))
+        movielist.append(random.randint(1, 10))
     for i in range(0, 50):
         img = movielist[i]
         generate_art(filename, x_size, y_size, i, img)
