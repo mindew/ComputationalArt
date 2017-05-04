@@ -1,10 +1,14 @@
 """ This code generates the computational arts. Movie generator
     renders images that are generated from generate_art as a video.
+    Now uses OpenCV2 as movie generation. Creating computational Art
+    by using this code is required before creating a video
     Created by Minju Kang"""
 
 import random
 import math
 from PIL import Image
+import numpy
+import cv2
 
 x_size = 350
 y_size = 350
@@ -143,16 +147,16 @@ def test_image(filename, x_size=350, y_size=350):
     im.save(filename)
 
 
-def generate_movie(filename, x_size=350, y_size=350):
-    movielist = []
-    for j in range(0, 50):
-        movielist.append(random.randint(1, 10))
-    for i in range(0, 50):
-        img = movielist[i]
-        generate_art(filename, x_size, y_size, i, img)
+# def generate_movie(filename, x_size=350, y_size=350):
+#     movielist = []
+#     for j in range(0, 50):
+#         movielist.append(random.randint(1, 10))
+#         for k in range(0, 5):
+#             img = movielist[k]
+#             generate_art(filename, x_size, y_size, img)
 
 
-def generate_art(filename, x_size, y_size, i, img):
+def generate_art(filename, x_size, y_size):
     # Functions for red, green, and blue channels - where the magic happens!
     red_function = build_random_function(7, 9)
     # red is the function of x
@@ -184,15 +188,49 @@ def generate_art(filename, x_size, y_size, i, img):
     # saves the image to disk as specified filename("myart.png")
 
 
+def generate_movie():
+    """ blends the image and then released blended image as movie"""
+    # load the pre-saved images that are generated from generate_art
+    image1 = Image.open("myart1.png")
+    image2 = Image.open("myart2.png")
+    image3 = Image.open("myart3.png")
+    image4 = Image.open("myart4.png")
+    image5 = Image.open("myart5.png")
+
+    # since all images have same height, width, layers, grab the shape from any image
+    height, width, layers = numpy.array(image1).shape
+
+    # create a video by using cv2
+    # looked after cv2 documentation
+    video = cv2.VideoWriter("my_movie", -1, 10, (width, height))
+
+    # merge the images
+    for i in range(0, 30):
+        # 30 frames for transition. 30 / 10 = 3 seconds for transition between two images
+        images1And2 = Image.blend(image1, image2, i/30.0)
+        video.write(cv2.cvtColor(numpy.array(images1And2), cv2.COLOR_RGB2BGR))
+        # and repeat the for loop for each image
+
+    for i in range(0, 30):
+        images2And3 = Image.blend(image2, image3, i/30.0)
+        video.write(cv2.cvtColor(numpy.array(images2And3), cv2.COLOR_RGB2BGR))
+
+    for i in range(0, 30):
+        images3And4 = Image.blend(image3, image4, i/30.0)
+        video.write(cv2.cvtColor(numpy.array(images3And4), cv2.COLOR_RGB2BGR))
+
+    for i in range(0, 30):
+        images4And5 = Image.blend(image4, image5, i/30.0)
+        video.write(cv2.cvtColor(numpy.array(images4And5), cv2.COLOR_RGB2BGR))
+
+    # return to image 1
+    for i in range(0, 30):
+        images5And1 = Image.blend(image5, image1, i/30.0)
+        video.write(cv2.cvtColor(numpy.array(images5And1), cv2.COLOR_RGB2BGR))
+
+    # release the video
+    video.release()
+
+
 if __name__ == '__main__':
-    # import doctest
-    # doctest.testmod(verbose=True)
-
-    # Create some computational art!
-    # TODO: Un-comment the generate_art function call after you
-    #       implement remap_interval and evaluate_random_function
-    generate_movie("movie.png")
-
-    # Test that PIL is installed correctly
-    # TODO: Comment or remove this function call after testing PIL install
-    # test_image("noise.png")
+    generate_movie()
